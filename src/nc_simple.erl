@@ -1,15 +1,19 @@
 -module(nc_simple).
 -compile(export_all).
 
+-record(nc_rpc_reply, {message_id, results}).
+-record(nc_rpc_error, {type, tag, severity}).
+
 reply({{'','rpc-reply'}, Attrs, Body}) ->
     Id = attr_value({'','message-id'}, Attrs),
-    {rpc_reply, Id, [rpc_reply(E) || E <- Body]}.
+    #nc_rpc_reply{message_id = Id, results = [rpc_reply(E) || E <- Body]}.
 
 
 rpc_reply({{'','rpc-error'}, _, Body}) ->
-    {error, [{type, error_info(type, elem_content({'','error-type'}, Body))},
-	     {tag,  error_info(tag, elem_content({'','error-tag'}, Body))},
-	     {severity, error_info(severity, elem_content({'','error-severity'}, Body))}]};
+    #nc_rpc_error{type = error_info(type, elem_content({'','error-type'}, Body)),
+		  tag  =  error_info(tag, elem_content({'','error-tag'}, Body)),
+		  severity = error_info(severity,
+					elem_content({'','error-severity'}, Body))};
 rpc_reply(Other) ->
     Other.
 
