@@ -5,16 +5,16 @@ file(F) ->
     xmerl_sax_parser:file(F, [{event_state, []},
 			      {event_fun, fun event/3}]).
 
-event({startElement, _, LocalName, _QName, Attrs}, _, Acc) ->
-    Attrs1 = [{list_to_binary(N), list_to_binary(V)} || {_, _, N, V} <- Attrs],
-    [{list_to_binary(LocalName), Attrs1, []}|Acc];
-event({endElement, _, LocalName, _QName}, _, S) ->
-    NBin = list_to_binary(LocalName),
+event({startElement, _, _LocalName, QName, Attrs}, _, Acc) ->
+    Attrs1 = [{list_to_atom(N), list_to_binary(V)} || {_, _, N, V} <- Attrs],
+    [{qname(QName), Attrs1, []}|Acc];
+event({endElement, _, _LocalName, QName}, _, S) ->
+    Name = qname(QName),
     case S of
-	{Cs, [{NBin, As, C}|Acc]} ->
-	    end_element(NBin, As, iolist_to_binary([C,Cs]), Acc);
-	[{NBin, Attrs, C}|Acc] ->
-	    end_element(NBin, Attrs, lists:reverse(C), Acc)
+	{Cs, [{Name, As, C}|Acc]} ->
+	    end_element(Name, As, iolist_to_binary([C,Cs]), Acc);
+	[{Name, Attrs, C}|Acc] ->
+	    end_element(Name, Attrs, lists:reverse(C), Acc)
     end;
 event({ignorableWhitespace, _}, _, {C, Acc}) ->
     {[C, " "], Acc};
@@ -29,3 +29,6 @@ end_element(Name, As, C, []) ->
     {Name, As, C};
 end_element(Name, As, C, [{PName, PAs, PC}|Acc]) ->
     [{PName, PAs, [{Name, As, C}|PC]}|Acc].
+
+qname({NS,Name}) ->
+    {list_to_atom(NS),list_to_atom(Name)}.
