@@ -1,0 +1,12 @@
+{application, netconf,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { netconf_app, []}},
+  {env, []}
+ ]}.
