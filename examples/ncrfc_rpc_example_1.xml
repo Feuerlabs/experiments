@@ -1,0 +1,16 @@
+<example>
+<rpc message-id="101"
+     xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+     xmlns:ex="http://example.net/content/1.0"
+     ex:user-id="fred">
+  <get/>
+</rpc>
+<rpc-reply message-id="101"
+	   xmlns="urn:ietf:params:xml:ns:netconf:base:1.0"
+	   xmlns:ex="http://example.net/content/1.0"
+	   ex:user-id="fred">
+  <data>
+    <!-- contents here... -->
+  </data>
+</rpc-reply>
+</example>

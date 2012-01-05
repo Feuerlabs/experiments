@@ -1,12 +1,18 @@
 -module(xmerl_simple).
--export([file/1]).
+-export([file/1, stream/1]).
 
 file(F) ->
-    xmerl_sax_parser:file(F, [{event_state, []},
-			      {event_fun, fun event/3}]).
+    xmerl_sax_parser:file(F, options()).
+
+stream(S) ->
+    xmerl_sax_parser:stream(S, options()).
+
+options() ->
+    [{event_state, []},
+     {event_fun, fun event/3}].
 
 event({startElement, _, _LocalName, QName, Attrs}, _, Acc) ->
-    Attrs1 = [{list_to_atom(N), list_to_binary(V)} || {_, _, N, V} <- Attrs],
+    Attrs1 = [{qname({Pfx,N}), list_to_binary(V)} || {_, Pfx, N, V} <- Attrs],
     [{qname(QName), Attrs1, []}|Acc];
 event({endElement, _, _LocalName, QName}, _, S) ->
     Name = qname(QName),
